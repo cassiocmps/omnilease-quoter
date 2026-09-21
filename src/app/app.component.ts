@@ -1,18 +1,44 @@
-import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, signal, computed, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { QuoteCardComponent } from './features/quotes/components/quote-card/quote-card.component';
+import { UiCardComponent } from './shared/components/ui-card/ui-card.component';
+import { CpfMaskDirective } from './shared/directives/cpf-mask.directive';
 import { ProviderQuote } from './core/models/insurance.models';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, CurrencyPipe, QuoteCardComponent],
+  imports: [CommonModule, CurrencyPipe, QuoteCardComponent, UiCardComponent, CpfMaskDirective],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
   readonly title = 'OmniLease Quoter';
+
+  /**
+   * Signal state tracking tenant information and live CPF masking (Milestone 2).
+   */
+  readonly tenantCpf = signal<string>('341.892.108-45');
+  readonly tenantName = signal<string>('Mariana S. Santos');
+  readonly tenantIncome = signal<number>(12500);
+  readonly totalCommitment = signal<number>(3730);
+
+  /**
+   * Toggle state for UiCardComponent featured projection styling.
+   */
+  readonly isCardFeatured = signal<boolean>(true);
+
+  /**
+   * Computed signals for tenant financial eligibility (3x income rule).
+   */
+  readonly incomeMultiplier = computed(() =>
+    (this.tenantIncome() / this.totalCommitment()).toFixed(2)
+  );
+
+  readonly isIncomeApproved = computed(() =>
+    this.tenantIncome() >= this.totalCommitment() * 3
+  );
 
   /**
    * Signal state tracking the currently selected quotation.
@@ -99,4 +125,22 @@ export class AppComponent {
   onQuoteSelected(quote: ProviderQuote): void {
     this.selectedQuote.set(quote);
   }
+
+  /**
+   * Updates the tenant CPF signal as user types through the masked input.
+   */
+  onCpfInput(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    if (target) {
+      this.tenantCpf.set(target.value);
+    }
+  }
+
+  /**
+   * Toggles the featured visual state of the projected UiCardComponent shell.
+   */
+  toggleCardFeatured(): void {
+    this.isCardFeatured.update(current => !current);
+  }
 }
+

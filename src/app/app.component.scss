@@ -91,41 +91,182 @@
   box-sizing: border-box;
 }
 
-.lease-summary-card {
-  background: #ffffff;
-  border-radius: 14px;
-  border: 1px solid #e2e8f0;
-  padding: 1.25rem 1.75rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 1.75rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+.tenant-section {
+  margin-bottom: 2rem;
 
-  .summary-col {
+  .card-header-flex {
+    width: 100%;
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
 
-    .summary-label {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #64748b;
-      font-weight: 600;
+  .header-badge-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .section-icon {
+      font-size: 1.5rem;
     }
 
-    .summary-val {
-      font-size: 0.95rem;
+    .card-headline {
+      font-size: 1.1rem;
+      font-weight: 700;
       color: #0f172a;
+      margin: 0;
     }
 
-    .badge-ok {
-      color: #059669;
-      font-size: 0.95rem;
+    .card-subheadline {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin: 0;
+    }
+  }
+
+  .rule-chip {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+
+    &.approved {
+      background: #ecfdf5;
+      color: #065f46;
+      border-color: #a7f3d0;
+    }
+  }
+
+  .lease-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+
+    .summary-col {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+
+      .summary-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .summary-val {
+        font-size: 1rem;
+        color: #0f172a;
+        font-weight: 700;
+      }
+
+      .summary-subtext {
+        font-size: 0.75rem;
+        color: #64748b;
+      }
+
+      .directive-tag {
+        font-size: 0.68rem;
+        padding: 0.15rem 0.4rem;
+        background: #eff6ff;
+        color: #2563eb;
+        border-radius: 4px;
+        font-family: monospace;
+        font-weight: 700;
+      }
+    }
+
+    .cpf-interactive-box {
+      .cpf-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+      }
+
+      .cpf-field {
+        width: 100%;
+        padding: 0.55rem 0.75rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #0f172a;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #ffffff;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+        &:focus {
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+      }
+
+      .cpf-valid-indicator {
+        position: absolute;
+        right: 0.6rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #059669;
+        background: #ecfdf5;
+        padding: 0.15rem 0.4rem;
+        border-radius: 4px;
+      }
+    }
+  }
+
+  .card-actions-wrapper {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+
+    .secondary-btn {
+      background: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      padding: 0.55rem 1rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s ease;
+
+      &:hover {
+        background: #e2e8f0;
+      }
+    }
+
+    .primary-btn {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      color: #ffffff;
+      border: none;
+      padding: 0.55rem 1.25rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+      transition: opacity 0.2s ease, transform 0.15s ease;
+
+      &:hover {
+        opacity: 0.95;
+        transform: translateY(-1px);
+      }
     }
   }
 }
+
 
 .selection-banner {
   display: flex;

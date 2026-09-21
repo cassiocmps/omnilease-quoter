@@ -1,0 +1,16 @@
+<div class="card-wrapper" [class.featured]="isFeatured()">
+  <!-- Projected Header Slot for Titles and Carrier Badges -->
+  <header class="card-header">
+    <ng-content select="[card-title]"></ng-content>
+  </header>
+
+  <!-- Default Projected Slot for Main Body Content -->
+  <div class="card-body">
+    <ng-content></ng-content>
+  </div>
+
+  <!-- Projected Footer Slot for Primary/Secondary Actions -->
+  <footer class="card-footer">
+    <ng-content select="[card-actions]"></ng-content>
+  </footer>
+</div>

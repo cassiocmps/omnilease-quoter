@@ -12,30 +12,103 @@
 
       <div class="milestone-pill">
         <span class="pulse-dot"></span>
-        <span>Milestone 1: Signal Inputs &amp; Modern Control Flow</span>
+        <span>Milestone 2: Content Projection &amp; Custom Directives</span>
       </div>
     </div>
   </header>
 
   <main class="main-content">
-    <!-- Lease Context Summary Box -->
-    <section class="lease-summary-card">
-      <div class="summary-col">
-        <span class="summary-label">Imóvel Cotado</span>
-        <strong class="summary-val">Apto Residencial (São Paulo - SP)</strong>
-      </div>
-      <div class="summary-col">
-        <span class="summary-label">Aluguel + Condomínio + IPTU</span>
-        <strong class="summary-val">R$ 3.730,00 /mês</strong>
-      </div>
-      <div class="summary-col">
-        <span class="summary-label">Inquilino (CPF)</span>
-        <strong class="summary-val">Mariana S. Santos (Renda: R$ 12.500,00)</strong>
-      </div>
-      <div class="summary-col income-rule">
-        <span class="summary-label">Regra Multiplicador de Renda</span>
-        <strong class="badge-ok">✓ 3.35x (Aprovado &ge; 3x)</strong>
-      </div>
+    <!-- Reusable UI Card Shell showcasing Multi-Slot Content Projection (<app-ui-card>) -->
+    <section class="tenant-section">
+      <app-ui-card [isFeatured]="isCardFeatured()">
+        <!-- Slot 1: [card-title] projected into card header -->
+        <div card-title class="card-header-flex">
+          <div class="header-badge-title">
+            <span class="section-icon" aria-hidden="true">🛡️</span>
+            <div>
+              <h2 class="card-headline">Perfil de Subscrição do Proponente</h2>
+              <p class="card-subheadline">Dados cadastrais consolidados para análise securitária</p>
+            </div>
+          </div>
+          <span class="rule-chip" [class.approved]="isIncomeApproved()">
+            @if (isIncomeApproved()) {
+              <span>✓ Renda Aprovada ({{ incomeMultiplier() }}x &ge; 3.0x)</span>
+            } @else {
+              <span>⚠ Renda Abaixo do Limite Mínimo (3.0x)</span>
+            }
+          </span>
+        </div>
+
+        <!-- Slot 2: Default Body Content projected into card body -->
+        <div class="lease-summary-grid">
+          <div class="summary-col">
+            <span class="summary-label">Imóvel Cotado</span>
+            <strong class="summary-val">Apto Residencial (São Paulo - SP)</strong>
+            <span class="summary-subtext">Locação residencial urbana padrão</span>
+          </div>
+
+          <div class="summary-col">
+            <span class="summary-label">Aluguel + Condomínio + IPTU</span>
+            <strong class="summary-val">{{ totalCommitment() | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}/mês</strong>
+            <span class="summary-subtext">Compromisso locatício integral</span>
+          </div>
+
+          <div class="summary-col">
+            <span class="summary-label">Proponente / Inquilino</span>
+            <strong class="summary-val">{{ tenantName() }}</strong>
+            <span class="summary-subtext">Renda Comprovada: {{ tenantIncome() | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+          </div>
+
+          <!-- Interactive CPF Document Input with [appCpfMask] Directive -->
+          <div class="summary-col cpf-interactive-box">
+            <label for="tenant-cpf-input" class="summary-label">
+              <span>CPF Proponente (Máscara Ativa)</span>
+              <span class="directive-tag">[appCpfMask]</span>
+            </label>
+            <div class="cpf-input-wrapper">
+              <input
+                id="tenant-cpf-input"
+                type="text"
+                class="cpf-field"
+                placeholder="000.000.000-00"
+                appCpfMask
+                [value]="tenantCpf()"
+                (input)="onCpfInput($event)"
+                maxlength="14"
+                autocomplete="off"
+              />
+              @if (tenantCpf().length === 14) {
+                <span class="cpf-valid-indicator" title="CPF formatado com 11 dígitos">✓ Válido</span>
+              }
+            </div>
+            <span class="summary-subtext">Formato normalizado: {{ tenantCpf() }}</span>
+          </div>
+        </div>
+
+        <!-- Slot 3: [card-actions] projected into card footer -->
+        <div card-actions class="card-actions-wrapper">
+          <button
+            type="button"
+            class="secondary-btn"
+            (click)="toggleCardFeatured()"
+            title="Alterna a propriedade isFeatured do componente app-ui-card"
+          >
+            @if (isCardFeatured()) {
+              <span>Desativar Destaque Shell</span>
+            } @else {
+              <span>Ativar Destaque Shell</span>
+            }
+          </button>
+
+          <button
+            type="button"
+            class="primary-btn"
+            title="Simulação de consulta ao birô de crédito"
+          >
+            Consultar Birô de Crédito (Serasa)
+          </button>
+        </div>
+      </app-ui-card>
     </section>
 
     <!-- Interactive Selection Notice Banner -->

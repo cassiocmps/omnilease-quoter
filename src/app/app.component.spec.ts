@@ -52,4 +52,46 @@ describe('AppComponent', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.selection-banner')?.textContent).toContain('Apex Marine Seguros');
   });
+
+  it('should render UiCardComponent shell with projected title, body, and actions', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+
+    const uiCard = compiled.querySelector('app-ui-card');
+    expect(uiCard).toBeTruthy();
+
+    const titleSlot = uiCard?.querySelector('[card-title]');
+    expect(titleSlot?.textContent).toContain('Perfil de Subscrição do Proponente');
+
+    const actionsSlot = uiCard?.querySelector('[card-actions]');
+    expect(actionsSlot?.textContent).toContain('Consultar Birô de Crédito (Serasa)');
+  });
+
+  it('should toggle card featured styling when toggleCardFeatured is called', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    fixture.detectChanges();
+
+    expect(app.isCardFeatured()).toBeTrue();
+    app.toggleCardFeatured();
+    expect(app.isCardFeatured()).toBeFalse();
+  });
+
+  it('should mask CPF typing input through CpfMaskDirective', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    fixture.detectChanges();
+
+    const cpfInput = fixture.nativeElement.querySelector('#tenant-cpf-input') as HTMLInputElement;
+    expect(cpfInput).toBeTruthy();
+
+    cpfInput.value = '11122233344';
+    cpfInput.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    expect(cpfInput.value).toBe('111.222.333-44');
+    expect(app.tenantCpf()).toBe('111.222.333-44');
+  });
 });
+

@@ -380,8 +380,8 @@ Write automated unit tests verifying business calculations, HTTP communications,
 
 ## Progress Checklist
 
-- [ ] **Milestone 1:** Component Foundations & Modern Signal Inputs/Outputs
-- [ ] **Milestone 2:** Content Projection & Custom Directives
+- [x] **Milestone 1:** Component Foundations & Modern Signal Inputs/Outputs
+- [x] **Milestone 2:** Content Projection & Custom Directives
 - [ ] **Milestone 3:** Services, Dependency Injection & RxJS Pipelines
 - [ ] **Milestone 4:** Fine-Grained Reactivity with Signals & RxJS Interop
 - [ ] **Milestone 5:** Strictly Typed Reactive Forms & Dynamic FormArrays
