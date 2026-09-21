@@ -1,0 +1,75 @@
+<div class="policy-page">
+  <div class="page-top-bar">
+    <a routerLink="/results" class="back-link">&larr; Voltar ao Comparativo de Seguradoras</a>
+  </div>
+
+  @if (matchedQuote(); as quote) {
+    <app-ui-card [isFeatured]="true">
+      <div card-title class="policy-header">
+        <div>
+          <span class="carrier-tag">{{ quote.providerName }}</span>
+          <h2 class="policy-title">Detalhes da Apólice &bull; {{ quote.quoteId }}</h2>
+        </div>
+        <span class="status-pill" [class]="quote.status.toLowerCase()">
+          {{ quote.status === 'APPROVED' ? 'Aprovado para Emissão' : 'Em Análise Manual' }}
+        </span>
+      </div>
+
+      <div class="policy-body">
+        <div class="financial-block">
+          <div class="val-box">
+            <span class="label">Mensalidade</span>
+            <strong class="value">{{ quote.financials.monthlyPremium | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}/mês</strong>
+          </div>
+          <div class="val-box">
+            <span class="label">Prêmio Anual Total</span>
+            <strong class="value">{{ quote.financials.annualPremium | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
+          </div>
+          <div class="val-box">
+            <span class="label">Compromisso Base Coberto</span>
+            <strong class="value">{{ quote.financials.totalCommitment | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}/mês</strong>
+          </div>
+          <div class="val-box">
+            <span class="label">Score de Crédito Homologado</span>
+            <strong class="value">{{ quote.creditScore }} pts</strong>
+          </div>
+        </div>
+
+        <div class="coverage-details">
+          <h3>Diferenciais da Cobertura Contratada</h3>
+          <ul>
+            @for (h of quote.highlights; track h) {
+              <li>✓ {{ h }}</li>
+            }
+          </ul>
+        </div>
+
+        <div class="installments-breakdown">
+          <h3>Condições de Pagamento</h3>
+          <div class="installments-grid">
+            @for (opt of quote.financials.installments; track opt.times) {
+              <div class="installment-chip">
+                <span>{{ opt.times }}x de {{ opt.value | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+                @if (!opt.hasInterest) {
+                  <span class="badge-free">Sem juros</span>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div card-actions class="policy-actions">
+        <a routerLink="/results" class="btn-cancel">Voltar</a>
+        <button type="button" class="btn-emit">
+          Emitir Certificado de Fiança Locatícia
+        </button>
+      </div>
+    </app-ui-card>
+  } @else {
+    <div class="not-found">
+      <p>Proposta com ID "{{ providerId() }}" não encontrada na sessão ativa.</p>
+      <a routerLink="/results" class="btn-cta">Voltar às Cotações</a>
+    </div>
+  }
+</div>

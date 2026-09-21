@@ -385,7 +385,7 @@ Write automated unit tests verifying business calculations, HTTP communications,
 - [x] **Milestone 3:** Services, Dependency Injection & RxJS Pipelines
 - [x] **Milestone 4:** Fine-Grained Reactivity with Signals & RxJS Interop
 - [x] **Milestone 5:** Strictly Typed Reactive Forms & Dynamic FormArrays
-- [ ] **Milestone 6:** Modern Routing, Lazy Loading & Functional Guards
+- [x] **Milestone 6:** Modern Routing, Lazy Loading & Functional Guards
 - [ ] **Milestone 7:** Senior Concurrency — Progressive Multi-Carrier Streaming
 - [ ] **Milestone 8:** Functional HTTP Interceptors & Zoneless Readiness
 - [ ] **Milestone 9:** Testing Suite (`TestBed` & `HttpTestingController`)

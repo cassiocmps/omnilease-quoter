@@ -1,0 +1,96 @@
+.wizard-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.property-section {
+  .card-header-flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header-badge-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .section-icon {
+      font-size: 1.5rem;
+    }
+
+    .card-headline {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+    }
+
+    .card-subheadline {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin: 0;
+    }
+  }
+
+  .property-grid {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 1.5rem;
+    align-items: center;
+
+    @media (max-width: 640px) {
+      grid-template-columns: 1fr;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+
+      label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #475569;
+      }
+
+      .form-control {
+        padding: 0.6rem 0.85rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #0f172a;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        outline: none;
+
+        &:focus {
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+      }
+    }
+
+    .address-preview {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+
+      .address-line {
+        font-size: 1.05rem;
+        color: #0f172a;
+
+        &.error {
+          color: #dc2626;
+          font-size: 0.9rem;
+        }
+      }
+
+      .city-line {
+        font-size: 0.85rem;
+        color: #64748b;
+        font-weight: 600;
+      }
+    }
+  }
+}

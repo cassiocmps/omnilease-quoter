@@ -1,0 +1,48 @@
+<div class="wizard-page">
+  <!-- Property Address Shell (Milestone 2 & 3 & 4) -->
+  <section class="property-section">
+    <app-ui-card [isFeatured]="true">
+      <div card-title class="card-header-flex">
+        <div class="header-badge-title">
+          <span class="section-icon" aria-hidden="true">📍</span>
+          <div>
+            <h2 class="card-headline">Endereço do Imóvel a Locar</h2>
+            <p class="card-subheadline">Autocompletado em tempo real via ViaCEP &amp; toSignal()</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="property-grid">
+        <div class="form-group">
+          <label for="wizard-cep-input">CEP (8 dígitos)</label>
+          <input
+            id="wizard-cep-input"
+            type="text"
+            class="form-control"
+            placeholder="00000-000"
+            appCepMask
+            [value]="propertyCep()"
+            (input)="onCepInput($event)"
+            maxlength="9"
+          />
+        </div>
+
+        <div class="address-preview">
+          @if (propertyAddress(); as addr) {
+            <span class="address-line">
+              <strong>{{ addr.logradouro }}</strong> - {{ addr.bairro }}
+            </span>
+            <span class="city-line">{{ addr.localidade }} / {{ addr.uf }}</span>
+          } @else {
+            <span class="address-line error">CEP não localizado ou inválido</span>
+          }
+        </div>
+      </div>
+    </app-ui-card>
+  </section>
+
+  <!-- Quotation Form Wizard (Milestone 5) -->
+  <section class="form-container">
+    <app-quote-form (formSubmit)="onFormSubmit($event)" />
+  </section>
+</div>

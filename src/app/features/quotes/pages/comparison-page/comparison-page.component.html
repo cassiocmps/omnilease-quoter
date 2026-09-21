@@ -1,0 +1,53 @@
+<div class="comparison-page">
+  <div class="page-top-bar">
+    <div>
+      <a routerLink="/quoter" class="back-link">&larr; Voltar ao Formulário de Cotação</a>
+      <h2 class="page-title">Comparativo de Fiança Locatícia</h2>
+      <p class="page-subtitle">Propostas calculadas em tempo real com base no perfil de crédito do locatário</p>
+    </div>
+    <span class="quotes-count">{{ quotes().length }} Propostas Ativas</span>
+  </div>
+
+  @if (selectedQuote(); as activeQuote) {
+    <div class="selection-callout">
+      <div class="callout-text">
+        <strong>Proposta em Destaque: {{ activeQuote.providerName }}</strong>
+        <span>{{ activeQuote.quoteId }} &bull; {{ activeQuote.financials.monthlyPremium | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}/mês</span>
+      </div>
+      <button
+        type="button"
+        class="proceed-btn"
+        (click)="proceedToPolicy(activeQuote)"
+      >
+        Prosseguir com Emissão de Apólice &rarr;
+      </button>
+    </div>
+  }
+
+  <div class="quotes-grid">
+    @for (quote of quotes(); track quote.quoteId) {
+      <div class="card-container">
+        <app-quote-card
+          [quote]="quote"
+          [isHighlighted]="quote.providerId === 'apex-marine'"
+          [isSelected]="selectedQuote()?.quoteId === quote.quoteId"
+          (selectQuote)="onSelectQuote($event)"
+        />
+        <div class="detail-action-bar">
+          <button
+            type="button"
+            class="view-detail-btn"
+            (click)="proceedToPolicy(quote)"
+          >
+            Ver Detalhes da Apólice &rarr;
+          </button>
+        </div>
+      </div>
+    } @empty {
+      <div class="empty-state">
+        <p>Nenhuma cotação ativa no momento. Inicie uma nova simulação.</p>
+        <a routerLink="/quoter" class="btn-cta">Nova Cotação</a>
+      </div>
+    }
+  </div>
+</div>

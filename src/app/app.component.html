@@ -12,207 +12,39 @@
 
       <div class="milestone-pill">
         <span class="pulse-dot"></span>
-        <span>Milestone 5: Typed Forms &amp; Dynamic FormArrays</span>
+        <span>Milestone 6: Modern Routing &amp; Functional Guards</span>
       </div>
     </div>
+
+    <!-- Navigation Tabs (Milestone 6) -->
+    <nav class="app-nav" aria-label="Navegação Principal">
+      <div class="nav-links">
+        <a
+          routerLink="/quoter"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="nav-tab"
+        >
+          1. Formulário de Cotação
+        </a>
+
+        <a
+          routerLink="/results"
+          routerLinkActive="active"
+          class="nav-tab"
+          [class.disabled]="!quoteState.hasActiveQuotes()"
+        >
+          2. Comparativo de Propostas
+          @if (quoteState.hasActiveQuotes()) {
+            <span class="count-badge">{{ quoteState.quotes().length }}</span>
+          }
+        </a>
+      </div>
+    </nav>
   </header>
 
+  <!-- Main Routing Container with Lazy-Loaded Route Outlet -->
   <main class="main-content">
-    <!-- Reusable UI Card Shell showcasing Multi-Slot Content Projection (<app-ui-card>) -->
-    <section class="tenant-section">
-      <app-ui-card [isFeatured]="isCardFeatured()">
-        <!-- Slot 1: [card-title] projected into card header -->
-        <div card-title class="card-header-flex">
-          <div class="header-badge-title">
-            <span class="section-icon" aria-hidden="true">🛡️</span>
-            <div>
-              <h2 class="card-headline">Simulador de Subscrição &amp; Renda Locatícia</h2>
-              <p class="card-subheadline">Reatividade fina via Signals, computed() e toSignal()</p>
-            </div>
-          </div>
-          <span class="rule-chip" [class.approved]="isIncomeApproved()">
-            @if (isIncomeApproved()) {
-              <span>✓ Aprovado ({{ incomeMultiplier() }}x &ge; 3.0x mín. {{ minimumRequiredIncome() | currency:'BRL':'symbol':'1.0-0':'pt-BR' }})</span>
-            } @else {
-              <span>⚠ Reprovado: Renda mínima exigida é {{ minimumRequiredIncome() | currency:'BRL':'symbol':'1.0-0':'pt-BR' }} (3x)</span>
-            }
-          </span>
-        </div>
-
-        <!-- Slot 2: Default Body Content projected into card body -->
-        <div class="lease-summary-grid">
-          <!-- Interactive CEP Search Input with [appCepMask] and toSignal() Bridge (Milestone 4) -->
-          <div class="summary-col cep-interactive-box">
-            <label for="property-cep-input" class="summary-label">
-              <span>CEP Imóvel (toSignal)</span>
-              <span class="directive-tag">[appCepMask]</span>
-            </label>
-            <div class="cep-input-wrapper">
-              <input
-                id="property-cep-input"
-                type="text"
-                class="cep-field"
-                placeholder="00000-000"
-                appCepMask
-                [value]="propertyCep()"
-                (input)="onCepInput($event)"
-                maxlength="9"
-                autocomplete="off"
-              />
-              @if (propertyAddress(); as addr) {
-                <span class="cep-valid-indicator" title="Endereço localizado via toSignal">✓ {{ addr.uf }}</span>
-              }
-            </div>
-            @if (propertyAddress(); as addr) {
-              <span class="summary-subtext address-display">
-                {{ addr.logradouro }}, {{ addr.bairro }} - {{ addr.localidade }}/{{ addr.uf }}
-              </span>
-            } @else {
-              <span class="summary-subtext address-display error">CEP não localizado</span>
-            }
-          </div>
-
-          <!-- Fine-Grained Financial Signals: Rent, Condo, IPTU (Milestone 4) -->
-          <div class="summary-col financial-input-box">
-            <span class="summary-label">
-              <span>Aluguel Base</span>
-              <span class="directive-tag">signal()</span>
-            </span>
-            <input
-              type="number"
-              class="financial-field"
-              [value]="rent()"
-              (input)="setRent(+$any($event.target).value)"
-              min="0"
-              step="100"
-            />
-            <span class="summary-subtext">Condo: {{ condo() | currency:'BRL':'symbol':'1.0-0':'pt-BR' }} | IPTU: {{ iptu() | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
-          </div>
-
-          <div class="summary-col">
-            <span class="summary-label">
-              <span>Compromisso Total</span>
-              <span class="directive-tag">computed()</span>
-            </span>
-            <strong class="summary-val">{{ totalCommitment() | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}/mês</strong>
-            <span class="summary-subtext">Renda mínima (3x): {{ minimumRequiredIncome() | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
-          </div>
-
-          <div class="summary-col financial-input-box">
-            <span class="summary-label">
-              <span>Renda Inquilino</span>
-              <span class="directive-tag">signal()</span>
-            </span>
-            <input
-              type="number"
-              class="financial-field"
-              [value]="tenantIncome()"
-              (input)="setTenantIncome(+$any($event.target).value)"
-              min="0"
-              step="500"
-            />
-            <span class="summary-subtext">Proponente: {{ tenantName() }}</span>
-          </div>
-
-          <!-- Interactive CPF Document Input with [appCpfMask] Directive -->
-          <div class="summary-col cpf-interactive-box">
-            <label for="tenant-cpf-input" class="summary-label">
-              <span>CPF Proponente (Máscara Ativa)</span>
-              <span class="directive-tag">[appCpfMask]</span>
-            </label>
-            <div class="cpf-input-wrapper">
-              <input
-                id="tenant-cpf-input"
-                type="text"
-                class="cpf-field"
-                placeholder="000.000.000-00"
-                appCpfMask
-                [value]="tenantCpf()"
-                (input)="onCpfInput($event)"
-                maxlength="14"
-                autocomplete="off"
-              />
-              @if (tenantCpf().length === 14) {
-                <span class="cpf-valid-indicator" title="CPF formatado com 11 dígitos">✓ Válido</span>
-              }
-            </div>
-            <span class="summary-subtext">Formato normalizado: {{ tenantCpf() }}</span>
-          </div>
-        </div>
-
-        <!-- Slot 3: [card-actions] projected into card footer -->
-        <div card-actions class="card-actions-wrapper">
-          <button
-            type="button"
-            class="secondary-btn"
-            (click)="toggleCardFeatured()"
-            title="Alterna a propriedade isFeatured do componente app-ui-card"
-          >
-            @if (isCardFeatured()) {
-              <span>Desativar Destaque Shell</span>
-            } @else {
-              <span>Ativar Destaque Shell</span>
-            }
-          </button>
-
-          <button
-            type="button"
-            class="primary-btn"
-            title="Simulação de consulta ao birô de crédito"
-          >
-            Consultar Birô de Crédito (Serasa)
-          </button>
-        </div>
-      </app-ui-card>
-    </section>
-
-    <!-- Quotation Wizard Section (Milestone 5: Typed Forms & FormArrays) -->
-    <section class="wizard-section">
-      <div class="section-header">
-        <div>
-          <h2 class="section-title">Formulário de Subscrição (Wizard)</h2>
-          <p class="section-subtitle">Typed Reactive Forms com NonNullableFormBuilder, Validador de CPF e Co-locatários dinâmicos</p>
-        </div>
-      </div>
-      <app-quote-form (formSubmit)="onWizardSubmit($event)" />
-    </section>
-
-    <!-- Interactive Selection Notice Banner -->
-    @if (selectedQuote(); as activeQuote) {
-      <div class="selection-banner" role="status">
-        <div class="banner-icon">✓</div>
-        <div class="banner-text">
-          <strong>Proposta Selecionada: {{ activeQuote.providerName }}</strong>
-          <span>({{ activeQuote.quoteId }} &bull; {{ activeQuote.financials.monthlyPremium | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}/mês)</span>
-        </div>
-        <span class="status-indicator">Pronta para emissão</span>
-      </div>
-    }
-
-    <!-- Quotes Grid Section using modern native control flow -->
-    <section class="quotes-section">
-      <div class="section-header">
-        <div>
-          <h2 class="section-title">Cotações Disponíveis</h2>
-          <p class="section-subtitle">Comparativo em tempo real de taxas e diferenciais de cobertura</p>
-        </div>
-        <span class="carrier-count">{{ carrierQuotes().length }} Seguradoras Integradas</span>
-      </div>
-
-      <div class="quotes-grid">
-        @for (quote of carrierQuotes(); track quote.quoteId) {
-          <app-quote-card
-            [quote]="quote"
-            [isHighlighted]="quote.providerId === 'apex-marine'"
-            [isSelected]="selectedQuote()?.quoteId === quote.quoteId"
-            (selectQuote)="onQuoteSelected($event)"
-          />
-        } @empty {
-          <div class="empty-state">
-            <p>Nenhuma cotação disponível no momento.</p>
-          </div>
-        }
-      </div>
-    </section>
+    <router-outlet />
   </main>
 </div>

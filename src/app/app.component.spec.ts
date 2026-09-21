@@ -1,26 +1,31 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
+import { By } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
+import { QuoteStateService } from './core/services/quote-state.service';
 import { LOCALE_ID } from '@angular/core';
-import { provideHttpClient } from '@angular/common/http';
-import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
 
 registerLocaleData(localePt);
 
-describe('AppComponent', () => {
+describe('AppComponent (Routing Application Shell)', () => {
+  let quoteState: QuoteStateService;
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
       providers: [
-        provideHttpClient(),
-        provideHttpClientTesting(),
+        QuoteStateService,
+        provideRouter([]),
         { provide: LOCALE_ID, useValue: 'pt-BR' }
       ]
     }).compileComponents();
+
+    quoteState = TestBed.inject(QuoteStateService);
   });
 
-  it('should create the app', () => {
+  it('should create the app shell', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
@@ -32,122 +37,25 @@ describe('AppComponent', () => {
     expect(app.title).toEqual('OmniLease Quoter');
   });
 
-  it('should render the brand title and carrier quote cards', () => {
+  it('should render the brand title and router-outlet', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
+
     expect(compiled.querySelector('.brand-title')?.textContent).toContain('OmniLease');
-
-    // Should render 3 quote cards
-    const cards = compiled.querySelectorAll('app-quote-card');
-    expect(cards.length).toBe(3);
+    expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 
-  it('should update selectedQuote signal when onQuoteSelected is called', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    fixture.detectChanges();
-
-    const mockQuote = app.carrierQuotes()[0];
-    app.onQuoteSelected(mockQuote);
-    fixture.detectChanges();
-
-    expect(app.selectedQuote()).toEqual(mockQuote);
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.selection-banner')?.textContent).toContain('Apex Marine Seguros');
-  });
-
-  it('should render UiCardComponent shell with projected title, body, and actions', () => {
+  it('should render navigation tabs with disabled state for results when no quotes exist', () => {
+    quoteState.clear();
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
 
-    const uiCard = compiled.querySelector('app-ui-card');
-    expect(uiCard).toBeTruthy();
+    const tabs = fixture.debugElement.queryAll(By.css('.nav-tab'));
+    expect(tabs.length).toBe(2);
 
-    const titleSlot = uiCard?.querySelector('[card-title]');
-    expect(titleSlot?.textContent).toContain('Simulador de Subscrição & Renda Locatícia');
-
-    const actionsSlot = uiCard?.querySelector('[card-actions]');
-    expect(actionsSlot?.textContent).toContain('Consultar Birô de Crédito (Serasa)');
-  });
-
-  it('should toggle card featured styling when toggleCardFeatured is called', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    fixture.detectChanges();
-
-    expect(app.isCardFeatured()).toBeTrue();
-    app.toggleCardFeatured();
-    expect(app.isCardFeatured()).toBeFalse();
-  });
-
-  it('should mask CPF typing input through CpfMaskDirective', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    fixture.detectChanges();
-
-    const cpfInput = fixture.nativeElement.querySelector('#tenant-cpf-input') as HTMLInputElement;
-    expect(cpfInput).toBeTruthy();
-
-    cpfInput.value = '11122233344';
-    cpfInput.dispatchEvent(new Event('input'));
-    fixture.detectChanges();
-
-    expect(cpfInput.value).toBe('111.222.333-44');
-    expect(app.tenantCpf()).toBe('111.222.333-44');
-  });
-
-  it('should mask CEP typing and trigger AddressLookupService pipeline', fakeAsync(() => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    const httpMock = TestBed.inject(HttpTestingController);
-    fixture.detectChanges();
-
-    const cepInput = fixture.nativeElement.querySelector('#property-cep-input') as HTMLInputElement;
-    expect(cepInput).toBeTruthy();
-
-    // Type 8 digits
-    cepInput.value = '01310100';
-    cepInput.dispatchEvent(new Event('input'));
-    tick(350); // wait for debounce
-    fixture.detectChanges();
-
-    const req = httpMock.expectOne('https://viacep.com.br/ws/01310100/json/');
-    req.flush({
-      cep: '01310-100',
-      logradouro: 'Avenida Paulista',
-      complemento: 'de 611 a 1045 - lado ímpar',
-      bairro: 'Bela Vista',
-      localidade: 'São Paulo',
-      uf: 'SP'
-    });
-
-    fixture.detectChanges();
-    expect(cepInput.value).toBe('01310-100');
-    expect(app.propertyAddress()?.logradouro).toBe('Avenida Paulista');
-    httpMock.verify();
-  }));
-
-  it('should compute totalCommitment and minimumRequiredIncome dynamically from signals', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    fixture.detectChanges();
-
-    // Default: rent=2500, condo=600, iptu=150 => 3250
-    expect(app.totalCommitment()).toBe(3250);
-    expect(app.minimumRequiredIncome()).toBe(9750); // 3250 * 3
-    expect(app.isIncomeApproved()).toBeTrue(); // 12500 >= 9750
-
-    // Mutate rent signal
-    app.setRent(4000);
-    expect(app.totalCommitment()).toBe(4750);
-    expect(app.minimumRequiredIncome()).toBe(14250); // 4750 * 3
-    expect(app.isIncomeApproved()).toBeFalse(); // 12500 < 14250
-
-    // Increase tenant income signal
-    app.setTenantIncome(15000);
-    expect(app.isIncomeApproved()).toBeTrue(); // 15000 >= 14250
+    // Results tab should have disabled class
+    const resultsTab = tabs[1].nativeElement as HTMLElement;
+    expect(resultsTab.classList.contains('disabled')).toBeTrue();
   });
 });
-
