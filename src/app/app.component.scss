@@ -251,6 +251,27 @@
         }
       }
     }
+
+    .financial-input-box {
+      .financial-field {
+        width: 100%;
+        padding: 0.55rem 0.75rem;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0f172a;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        background: #ffffff;
+        font-family: inherit;
+        outline: none;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+        &:focus {
+          border-color: #3b82f6;
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+      }
+    }
   }
 
   .card-actions-wrapper {

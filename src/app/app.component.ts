@@ -1,5 +1,5 @@
-import { Component, signal, computed, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, signal, computed, effect, inject, ChangeDetectionStrategy } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Subject } from 'rxjs';
 import { QuoteCardComponent } from './features/quotes/components/quote-card/quote-card.component';
@@ -29,46 +29,71 @@ export class AppComponent {
   readonly title = 'OmniLease Quoter';
 
   private readonly addressService = inject(AddressLookupService);
-  private readonly destroyRef = inject(DestroyRef);
 
   /**
-   * Reactive stream subject for debounced address lookup (Milestone 3).
+   * Reactive stream subject for debounced address lookup.
    */
   readonly cepSubject = new Subject<string>();
   readonly propertyCep = signal<string>('01310-100');
-  readonly isSearchingCep = signal<boolean>(false);
-  readonly propertyAddress = signal<AddressResult | null>({
-    cep: '01310-100',
-    logradouro: 'Avenida Paulista',
-    complemento: 'Bela Vista',
-    bairro: 'Bela Vista',
-    localidade: 'São Paulo',
-    uf: 'SP'
-  });
 
   /**
-   * Signal state tracking tenant information and live CPF masking (Milestone 2).
+   * RxJS-to-Signal Bridge (Milestone 4):
+   * Seamlessly converts the address search Observable stream into a readonly Signal.
+   * Eliminates manual .subscribe() and manual takeUntilDestroyed() teardowns!
+   */
+  readonly propertyAddress = toSignal(
+    this.addressService.searchAddressByCep(this.cepSubject),
+    {
+      initialValue: {
+        cep: '01310-100',
+        logradouro: 'Avenida Paulista',
+        complemento: 'Bela Vista',
+        bairro: 'Bela Vista',
+        localidade: 'São Paulo',
+        uf: 'SP'
+      } as AddressResult
+    }
+  );
+
+  /**
+   * Fine-Grained Reactive Financial State (Milestone 4):
+   * Independent writable signals modeling lease commitments.
+   */
+  readonly rent = signal<number>(2500);
+  readonly condo = signal<number>(600);
+  readonly iptu = signal<number>(150);
+
+  /**
+   * Glitch-Free Computed Derivations:
+   * Re-evaluates synchronously and lazily only when dependent signals mutate.
+   */
+  readonly totalCommitment = computed(() => this.rent() + this.condo() + this.iptu());
+
+  /**
+   * Enterprise Underwriting Rule:
+   * Tenant minimum qualifying gross income (3x total commitment multiplier).
+   */
+  readonly minimumRequiredIncome = computed(() => this.totalCommitment() * 3);
+
+  /**
+   * Tenant profile signals
    */
   readonly tenantCpf = signal<string>('341.892.108-45');
   readonly tenantName = signal<string>('Mariana S. Santos');
   readonly tenantIncome = signal<number>(12500);
-  readonly totalCommitment = signal<number>(3730);
+
+  readonly incomeMultiplier = computed(() =>
+    this.totalCommitment() > 0 ? (this.tenantIncome() / this.totalCommitment()).toFixed(2) : '0.00'
+  );
+
+  readonly isIncomeApproved = computed(() =>
+    this.tenantIncome() >= this.minimumRequiredIncome()
+  );
 
   /**
    * Toggle state for UiCardComponent featured projection styling.
    */
   readonly isCardFeatured = signal<boolean>(true);
-
-  /**
-   * Computed signals for tenant financial eligibility (3x income rule).
-   */
-  readonly incomeMultiplier = computed(() =>
-    (this.tenantIncome() / this.totalCommitment()).toFixed(2)
-  );
-
-  readonly isIncomeApproved = computed(() =>
-    this.tenantIncome() >= this.totalCommitment() * 3
-  );
 
   /**
    * Signal state tracking the currently selected quotation.
@@ -150,20 +175,39 @@ export class AppComponent {
   ]);
 
   constructor() {
-    // Pipeline connection: Subscribes to the debounced ViaCEP typeahead stream
-    this.addressService.searchAddressByCep(this.cepSubject)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (result) => {
-          this.isSearchingCep.set(false);
-          if (result) {
-            this.propertyAddress.set(result);
-          }
-        },
-        error: () => {
-          this.isSearchingCep.set(false);
-        }
-      });
+    /**
+     * Reactive Audit Effect (Milestone 4):
+     * Demonstrates effect() executing whenever fine-grained signals change.
+     * Used in enterprise apps for analytics tracking, external sync, and underwriting audit logs.
+     */
+    effect(() => {
+      const commitment = this.totalCommitment();
+      const minIncome = this.minimumRequiredIncome();
+      const currentIncome = this.tenantIncome();
+      const approved = this.isIncomeApproved();
+      console.log(
+        `[OmniLease Underwriting Engine] Commitment: R$ ${commitment} | Req. Income (3x): R$ ${minIncome} | Actual Income: R$ ${currentIncome} | Approved: ${approved}`
+      );
+    });
+  }
+
+  /**
+   * Financial Mutation Methods updating fine-grained signals.
+   */
+  setRent(value: number): void {
+    this.rent.set(Math.max(0, value));
+  }
+
+  setCondo(value: number): void {
+    this.condo.set(Math.max(0, value));
+  }
+
+  setIptu(value: number): void {
+    this.iptu.set(Math.max(0, value));
+  }
+
+  setTenantIncome(value: number): void {
+    this.tenantIncome.set(Math.max(0, value));
   }
 
   /**
@@ -190,12 +234,6 @@ export class AppComponent {
     const target = event.target as HTMLInputElement;
     if (target) {
       this.propertyCep.set(target.value);
-      const digits = target.value.replace(/\D/g, '');
-      if (digits.length === 8) {
-        this.isSearchingCep.set(true);
-      } else {
-        this.isSearchingCep.set(false);
-      }
       this.cepSubject.next(target.value);
     }
   }

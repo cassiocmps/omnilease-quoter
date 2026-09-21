@@ -66,7 +66,7 @@ describe('AppComponent', () => {
     expect(uiCard).toBeTruthy();
 
     const titleSlot = uiCard?.querySelector('[card-title]');
-    expect(titleSlot?.textContent).toContain('Perfil de Subscrição do Proponente');
+    expect(titleSlot?.textContent).toContain('Simulador de Subscrição & Renda Locatícia');
 
     const actionsSlot = uiCard?.querySelector('[card-actions]');
     expect(actionsSlot?.textContent).toContain('Consultar Birô de Crédito (Serasa)');
@@ -128,5 +128,26 @@ describe('AppComponent', () => {
     expect(app.propertyAddress()?.logradouro).toBe('Avenida Paulista');
     httpMock.verify();
   }));
+
+  it('should compute totalCommitment and minimumRequiredIncome dynamically from signals', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    fixture.detectChanges();
+
+    // Default: rent=2500, condo=600, iptu=150 => 3250
+    expect(app.totalCommitment()).toBe(3250);
+    expect(app.minimumRequiredIncome()).toBe(9750); // 3250 * 3
+    expect(app.isIncomeApproved()).toBeTrue(); // 12500 >= 9750
+
+    // Mutate rent signal
+    app.setRent(4000);
+    expect(app.totalCommitment()).toBe(4750);
+    expect(app.minimumRequiredIncome()).toBe(14250); // 4750 * 3
+    expect(app.isIncomeApproved()).toBeFalse(); // 12500 < 14250
+
+    // Increase tenant income signal
+    app.setTenantIncome(15000);
+    expect(app.isIncomeApproved()).toBeTrue(); // 15000 >= 14250
+  });
 });
 

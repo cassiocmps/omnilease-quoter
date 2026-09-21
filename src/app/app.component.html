@@ -12,7 +12,7 @@
 
       <div class="milestone-pill">
         <span class="pulse-dot"></span>
-        <span>Milestone 3: Services, DI &amp; RxJS Pipelines</span>
+        <span>Milestone 4: Fine-Grained Signals &amp; RxJS Interop</span>
       </div>
     </div>
   </header>
@@ -26,25 +26,25 @@
           <div class="header-badge-title">
             <span class="section-icon" aria-hidden="true">🛡️</span>
             <div>
-              <h2 class="card-headline">Perfil de Subscrição do Proponente</h2>
-              <p class="card-subheadline">Dados cadastrais consolidados para análise securitária</p>
+              <h2 class="card-headline">Simulador de Subscrição &amp; Renda Locatícia</h2>
+              <p class="card-subheadline">Reatividade fina via Signals, computed() e toSignal()</p>
             </div>
           </div>
           <span class="rule-chip" [class.approved]="isIncomeApproved()">
             @if (isIncomeApproved()) {
-              <span>✓ Renda Aprovada ({{ incomeMultiplier() }}x &ge; 3.0x)</span>
+              <span>✓ Aprovado ({{ incomeMultiplier() }}x &ge; 3.0x mín. {{ minimumRequiredIncome() | currency:'BRL':'symbol':'1.0-0':'pt-BR' }})</span>
             } @else {
-              <span>⚠ Renda Abaixo do Limite Mínimo (3.0x)</span>
+              <span>⚠ Reprovado: Renda mínima exigida é {{ minimumRequiredIncome() | currency:'BRL':'symbol':'1.0-0':'pt-BR' }} (3x)</span>
             }
           </span>
         </div>
 
         <!-- Slot 2: Default Body Content projected into card body -->
         <div class="lease-summary-grid">
-          <!-- Interactive CEP Search Input with [appCepMask] and RxJS Pipeline (Milestone 3) -->
+          <!-- Interactive CEP Search Input with [appCepMask] and toSignal() Bridge (Milestone 4) -->
           <div class="summary-col cep-interactive-box">
             <label for="property-cep-input" class="summary-label">
-              <span>CEP Imóvel (ViaCEP RxJS)</span>
+              <span>CEP Imóvel (toSignal)</span>
               <span class="directive-tag">[appCepMask]</span>
             </label>
             <div class="cep-input-wrapper">
@@ -59,12 +59,8 @@
                 maxlength="9"
                 autocomplete="off"
               />
-              @if (isSearchingCep()) {
-                <span class="cep-loading-indicator" title="Consultando ViaCEP via switchMap...">Buscando...</span>
-              } @else {
-                @if (propertyAddress(); as addr) {
-                  <span class="cep-valid-indicator" title="Endereço localizado">✓ {{ addr.uf }}</span>
-                }
+              @if (propertyAddress(); as addr) {
+                <span class="cep-valid-indicator" title="Endereço localizado via toSignal">✓ {{ addr.uf }}</span>
               }
             </div>
             @if (propertyAddress(); as addr) {
@@ -76,16 +72,46 @@
             }
           </div>
 
-          <div class="summary-col">
-            <span class="summary-label">Aluguel + Condomínio + IPTU</span>
-            <strong class="summary-val">{{ totalCommitment() | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}/mês</strong>
-            <span class="summary-subtext">Compromisso locatício integral</span>
+          <!-- Fine-Grained Financial Signals: Rent, Condo, IPTU (Milestone 4) -->
+          <div class="summary-col financial-input-box">
+            <span class="summary-label">
+              <span>Aluguel Base</span>
+              <span class="directive-tag">signal()</span>
+            </span>
+            <input
+              type="number"
+              class="financial-field"
+              [value]="rent()"
+              (input)="setRent(+$any($event.target).value)"
+              min="0"
+              step="100"
+            />
+            <span class="summary-subtext">Condo: {{ condo() | currency:'BRL':'symbol':'1.0-0':'pt-BR' }} | IPTU: {{ iptu() | currency:'BRL':'symbol':'1.0-0':'pt-BR' }}</span>
           </div>
 
           <div class="summary-col">
-            <span class="summary-label">Proponente / Inquilino</span>
-            <strong class="summary-val">{{ tenantName() }}</strong>
-            <span class="summary-subtext">Renda Comprovada: {{ tenantIncome() | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+            <span class="summary-label">
+              <span>Compromisso Total</span>
+              <span class="directive-tag">computed()</span>
+            </span>
+            <strong class="summary-val">{{ totalCommitment() | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}/mês</strong>
+            <span class="summary-subtext">Renda mínima (3x): {{ minimumRequiredIncome() | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+          </div>
+
+          <div class="summary-col financial-input-box">
+            <span class="summary-label">
+              <span>Renda Inquilino</span>
+              <span class="directive-tag">signal()</span>
+            </span>
+            <input
+              type="number"
+              class="financial-field"
+              [value]="tenantIncome()"
+              (input)="setTenantIncome(+$any($event.target).value)"
+              min="0"
+              step="500"
+            />
+            <span class="summary-subtext">Proponente: {{ tenantName() }}</span>
           </div>
 
           <!-- Interactive CPF Document Input with [appCpfMask] Directive -->
