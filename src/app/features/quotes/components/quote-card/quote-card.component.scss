@@ -1,0 +1,284 @@
+.quote-card {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  padding: 1.5rem;
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.1), 0 4px 8px -2px rgba(0, 0, 0, 0.04);
+    border-color: #cbd5e1;
+  }
+
+  &:focus-visible {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  }
+
+  &.highlighted {
+    border-color: #3b82f6;
+    box-shadow: 0 8px 20px -2px rgba(59, 130, 246, 0.15);
+  }
+
+  &.selected {
+    border: 2px solid #059669;
+    box-shadow: 0 10px 25px -3px rgba(5, 150, 105, 0.2);
+  }
+
+  &.apex-marine-theme {
+    border-top: 4px solid #0284c7;
+  }
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+
+  .carrier-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .carrier-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.5px;
+    }
+
+    .carrier-name {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .response-time {
+      font-size: 0.75rem;
+      color: #64748b;
+    }
+  }
+
+  .status-badge {
+    padding: 0.25rem 0.65rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+
+    &.approved {
+      background: #ecfdf5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
+    }
+
+    &.pending_analysis {
+      background: #fffbeb;
+      color: #92400e;
+      border: 1px solid #fde68a;
+    }
+
+    &.refused {
+      background: #fef2f2;
+      color: #991b1b;
+      border: 1px solid #fecaca;
+    }
+  }
+}
+
+.apex-exclusive-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(90deg, #f0f9ff, #e0f2fe);
+  border: 1px solid #bae6fd;
+  color: #0369a1;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 1.25rem;
+
+  .badge-icon {
+    flex-shrink: 0;
+    color: #0284c7;
+  }
+}
+
+.financial-summary {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+
+  .price-primary {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.4rem;
+
+    .price-label {
+      font-size: 0.85rem;
+      color: #475569;
+      font-weight: 500;
+    }
+
+    .price-amount {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #0f172a;
+
+      .frequency {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #64748b;
+      }
+    }
+  }
+
+  .price-secondary {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: #475569;
+    padding-top: 0.35rem;
+    border-top: 1px dashed #e2e8f0;
+
+    strong {
+      color: #1e293b;
+    }
+  }
+
+  .commitment-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 0.35rem;
+  }
+}
+
+.section-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  margin: 0 0 0.5rem 0;
+}
+
+.installments-section {
+  margin-bottom: 1.25rem;
+
+  .installments-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+
+    .installment-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: #334155;
+
+      .no-interest-tag {
+        background: #f1f5f9;
+        color: #475569;
+        font-size: 0.7rem;
+        padding: 0.15rem 0.4rem;
+        border-radius: 4px;
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+.highlights-section {
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+
+  .highlights-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+
+    .highlight-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      color: #334155;
+      line-height: 1.35;
+
+      .bullet-check {
+        color: #10b981;
+        font-weight: 800;
+      }
+    }
+  }
+}
+
+.empty-hint {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-style: italic;
+}
+
+.card-footer {
+  margin-top: auto;
+
+  .select-btn {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    border: none;
+    background: #0f172a;
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+
+    &:hover {
+      background: #1e293b;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    &.active {
+      background: #059669;
+      color: #ffffff;
+
+      &:hover {
+        background: #047857;
+      }
+    }
+  }
+}

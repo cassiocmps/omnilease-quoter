@@ -1,0 +1,115 @@
+<!-- Template Reference Variable #cardRef for potential DOM querying/focus management -->
+<article
+  #cardRef
+  class="quote-card"
+  [class.highlighted]="isHighlighted()"
+  [class.selected]="isSelected()"
+  [class.apex-marine-theme]="quote().providerId === 'apex-marine'"
+  tabindex="0"
+  role="region"
+  [attr.aria-label]="'Proposta ' + quote().providerName"
+>
+  <!-- Card Header with Carrier Identity & Status -->
+  <header class="card-header">
+    <div class="carrier-info">
+      <div class="carrier-avatar">
+        {{ quote().providerName.substring(0, 2).toUpperCase() }}
+      </div>
+      <div>
+        <h3 class="carrier-name">{{ quote().providerName }}</h3>
+        <span class="response-time">Resposta: {{ quote().responseTimeMs }}ms</span>
+      </div>
+    </div>
+
+    <!-- Status Badging -->
+    <div class="status-badge" [class]="quote().status.toLowerCase()">
+      @if (quote().status === 'APPROVED') {
+        <span>Aprovado</span>
+      } @else if (quote().status === 'PENDING_ANALYSIS') {
+        <span>Análise Manual</span>
+      } @else {
+        <span>Recusado</span>
+      }
+    </div>
+  </header>
+
+  <!-- Apex Marine Fast-Track Special Badge (Milestone 1 requirement) -->
+  @if (quote().providerId === 'apex-marine') {
+    <div class="apex-exclusive-badge" role="status">
+      <svg class="badge-icon" viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
+        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+      </svg>
+      <span>Aprovação Imediata &amp; Indenização em 3 dias úteis</span>
+    </div>
+  }
+
+  <!-- Pricing Details Section -->
+  <section class="financial-summary">
+    <div class="price-primary">
+      <span class="price-label">Mensalidade do Seguro</span>
+      <div class="price-amount">
+        {{ quote().financials.monthlyPremium | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}
+        <span class="frequency">/mês</span>
+      </div>
+    </div>
+
+    <div class="price-secondary">
+      <span class="price-sublabel">Total Anual:</span>
+      <strong>{{ quote().financials.annualPremium | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>
+    </div>
+
+    <div class="commitment-info">
+      <span>Compromisso locatício base:</span>
+      <span>{{ quote().financials.totalCommitment | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}/mês</span>
+    </div>
+  </section>
+
+  <!-- Installment Options Iteration using modern @for track -->
+  <section class="installments-section">
+    <h4 class="section-title">Opções de Parcelamento</h4>
+    <ul class="installments-list">
+      @for (opt of quote().financials.installments; track opt.times) {
+        <li class="installment-item">
+          <span>{{ opt.times }}x de {{ opt.value | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</span>
+          @if (!opt.hasInterest) {
+            <span class="no-interest-tag">Sem juros</span>
+          }
+        </li>
+      } @empty {
+        <li class="empty-hint">Condições de parcelamento sob consulta.</li>
+      }
+    </ul>
+  </section>
+
+  <!-- Carrier Differentiators & Highlights List -->
+  <section class="highlights-section">
+    <h4 class="section-title">Diferenciais da Cobertura</h4>
+    <ul class="highlights-list">
+      @for (item of quote().highlights; track item) {
+        <li class="highlight-item">
+          <span class="bullet-check" aria-hidden="true">✓</span>
+          <span>{{ item }}</span>
+        </li>
+      } @empty {
+        <li class="empty-hint">Sem destaques adicionais informados.</li>
+      }
+    </ul>
+  </section>
+
+  <!-- Card Action Footer -->
+  <footer class="card-footer">
+    <button
+      type="button"
+      class="select-btn"
+      [class.active]="isSelected()"
+      (click)="onSelect()"
+      [attr.aria-pressed]="isSelected()"
+    >
+      @if (isSelected()) {
+        <span>✓ Proposta Selecionada</span>
+      } @else {
+        <span>Selecionar Proposta</span>
+      }
+    </button>
+  </footer>
+</article>
