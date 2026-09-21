@@ -141,4 +141,18 @@ export class QuotationService {
 
     return merge(apex$, vanguard$, beacon$);
   }
+
+  /**
+   * Enterprise HTTP Quotation Dispatch (Milestone 9):
+   * Dispatches underwriting payload to backend API endpoint /api/v1/fianca/quotes.
+   * Employs interceptor-injected X-Correlation-ID and updates quotes signal state.
+   */
+  requestUnderwritingQuote(request: QuotationRequest): Observable<ProviderQuote[]> {
+    return this.http.post<ProviderQuote[]>('/api/v1/fianca/quotes', request).pipe(
+      map(quotes => {
+        this.quotes.set(quotes);
+        return quotes;
+      })
+    );
+  }
 }
