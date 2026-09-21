@@ -1,6 +1,8 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { LOCALE_ID } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
 
@@ -11,6 +13,8 @@ describe('AppComponent', () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         { provide: LOCALE_ID, useValue: 'pt-BR' }
       ]
     }).compileComponents();
@@ -93,5 +97,36 @@ describe('AppComponent', () => {
     expect(cpfInput.value).toBe('111.222.333-44');
     expect(app.tenantCpf()).toBe('111.222.333-44');
   });
+
+  it('should mask CEP typing and trigger AddressLookupService pipeline', fakeAsync(() => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    const httpMock = TestBed.inject(HttpTestingController);
+    fixture.detectChanges();
+
+    const cepInput = fixture.nativeElement.querySelector('#property-cep-input') as HTMLInputElement;
+    expect(cepInput).toBeTruthy();
+
+    // Type 8 digits
+    cepInput.value = '01310100';
+    cepInput.dispatchEvent(new Event('input'));
+    tick(350); // wait for debounce
+    fixture.detectChanges();
+
+    const req = httpMock.expectOne('https://viacep.com.br/ws/01310100/json/');
+    req.flush({
+      cep: '01310-100',
+      logradouro: 'Avenida Paulista',
+      complemento: 'de 611 a 1045 - lado ímpar',
+      bairro: 'Bela Vista',
+      localidade: 'São Paulo',
+      uf: 'SP'
+    });
+
+    fixture.detectChanges();
+    expect(cepInput.value).toBe('01310-100');
+    expect(app.propertyAddress()?.logradouro).toBe('Avenida Paulista');
+    httpMock.verify();
+  }));
 });
 

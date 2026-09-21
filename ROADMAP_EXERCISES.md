@@ -382,7 +382,7 @@ Write automated unit tests verifying business calculations, HTTP communications,
 
 - [x] **Milestone 1:** Component Foundations & Modern Signal Inputs/Outputs
 - [x] **Milestone 2:** Content Projection & Custom Directives
-- [ ] **Milestone 3:** Services, Dependency Injection & RxJS Pipelines
+- [x] **Milestone 3:** Services, Dependency Injection & RxJS Pipelines
 - [ ] **Milestone 4:** Fine-Grained Reactivity with Signals & RxJS Interop
 - [ ] **Milestone 5:** Strictly Typed Reactive Forms & Dynamic FormArrays
 - [ ] **Milestone 6:** Modern Routing, Lazy Loading & Functional Guards

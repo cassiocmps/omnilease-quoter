@@ -12,7 +12,7 @@
 
       <div class="milestone-pill">
         <span class="pulse-dot"></span>
-        <span>Milestone 2: Content Projection &amp; Custom Directives</span>
+        <span>Milestone 3: Services, DI &amp; RxJS Pipelines</span>
       </div>
     </div>
   </header>
@@ -41,10 +41,39 @@
 
         <!-- Slot 2: Default Body Content projected into card body -->
         <div class="lease-summary-grid">
-          <div class="summary-col">
-            <span class="summary-label">Imóvel Cotado</span>
-            <strong class="summary-val">Apto Residencial (São Paulo - SP)</strong>
-            <span class="summary-subtext">Locação residencial urbana padrão</span>
+          <!-- Interactive CEP Search Input with [appCepMask] and RxJS Pipeline (Milestone 3) -->
+          <div class="summary-col cep-interactive-box">
+            <label for="property-cep-input" class="summary-label">
+              <span>CEP Imóvel (ViaCEP RxJS)</span>
+              <span class="directive-tag">[appCepMask]</span>
+            </label>
+            <div class="cep-input-wrapper">
+              <input
+                id="property-cep-input"
+                type="text"
+                class="cep-field"
+                placeholder="00000-000"
+                appCepMask
+                [value]="propertyCep()"
+                (input)="onCepInput($event)"
+                maxlength="9"
+                autocomplete="off"
+              />
+              @if (isSearchingCep()) {
+                <span class="cep-loading-indicator" title="Consultando ViaCEP via switchMap...">Buscando...</span>
+              } @else {
+                @if (propertyAddress(); as addr) {
+                  <span class="cep-valid-indicator" title="Endereço localizado">✓ {{ addr.uf }}</span>
+                }
+              }
+            </div>
+            @if (propertyAddress(); as addr) {
+              <span class="summary-subtext address-display">
+                {{ addr.logradouro }}, {{ addr.bairro }} - {{ addr.localidade }}/{{ addr.uf }}
+              </span>
+            } @else {
+              <span class="summary-subtext address-display error">CEP não localizado</span>
+            }
           </div>
 
           <div class="summary-col">

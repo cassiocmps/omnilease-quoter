@@ -1,20 +1,50 @@
-import { Component, signal, computed, ChangeDetectionStrategy } from '@angular/core';
+import { Component, signal, computed, inject, DestroyRef, ChangeDetectionStrategy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule, CurrencyPipe } from '@angular/common';
+import { Subject } from 'rxjs';
 import { QuoteCardComponent } from './features/quotes/components/quote-card/quote-card.component';
 import { UiCardComponent } from './shared/components/ui-card/ui-card.component';
 import { CpfMaskDirective } from './shared/directives/cpf-mask.directive';
+import { CepMaskDirective } from './shared/directives/cep-mask.directive';
+import { AddressLookupService } from './core/services/address-lookup.service';
+import { AddressResult } from './core/models/address.models';
 import { ProviderQuote } from './core/models/insurance.models';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, CurrencyPipe, QuoteCardComponent, UiCardComponent, CpfMaskDirective],
+  imports: [
+    CommonModule,
+    CurrencyPipe,
+    QuoteCardComponent,
+    UiCardComponent,
+    CpfMaskDirective,
+    CepMaskDirective
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent {
   readonly title = 'OmniLease Quoter';
+
+  private readonly addressService = inject(AddressLookupService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  /**
+   * Reactive stream subject for debounced address lookup (Milestone 3).
+   */
+  readonly cepSubject = new Subject<string>();
+  readonly propertyCep = signal<string>('01310-100');
+  readonly isSearchingCep = signal<boolean>(false);
+  readonly propertyAddress = signal<AddressResult | null>({
+    cep: '01310-100',
+    logradouro: 'Avenida Paulista',
+    complemento: 'Bela Vista',
+    bairro: 'Bela Vista',
+    localidade: 'São Paulo',
+    uf: 'SP'
+  });
 
   /**
    * Signal state tracking tenant information and live CPF masking (Milestone 2).
@@ -119,6 +149,23 @@ export class AppComponent {
     }
   ]);
 
+  constructor() {
+    // Pipeline connection: Subscribes to the debounced ViaCEP typeahead stream
+    this.addressService.searchAddressByCep(this.cepSubject)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (result) => {
+          this.isSearchingCep.set(false);
+          if (result) {
+            this.propertyAddress.set(result);
+          }
+        },
+        error: () => {
+          this.isSearchingCep.set(false);
+        }
+      });
+  }
+
   /**
    * Event handler receiving output event from QuoteCardComponent.
    */
@@ -133,6 +180,23 @@ export class AppComponent {
     const target = event.target as HTMLInputElement;
     if (target) {
       this.tenantCpf.set(target.value);
+    }
+  }
+
+  /**
+   * Dispatches CEP updates through the debounced RxJS typeahead pipeline.
+   */
+  onCepInput(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    if (target) {
+      this.propertyCep.set(target.value);
+      const digits = target.value.replace(/\D/g, '');
+      if (digits.length === 8) {
+        this.isSearchingCep.set(true);
+      } else {
+        this.isSearchingCep.set(false);
+      }
+      this.cepSubject.next(target.value);
     }
   }
 

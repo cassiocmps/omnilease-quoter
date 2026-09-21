@@ -187,14 +187,17 @@
       }
     }
 
-    .cpf-interactive-box {
-      .cpf-input-wrapper {
+    .cpf-interactive-box,
+    .cep-interactive-box {
+      .cpf-input-wrapper,
+      .cep-input-wrapper {
         position: relative;
         display: flex;
         align-items: center;
       }
 
-      .cpf-field {
+      .cpf-field,
+      .cep-field {
         width: 100%;
         padding: 0.55rem 0.75rem;
         font-size: 0.95rem;
@@ -213,7 +216,8 @@
         }
       }
 
-      .cpf-valid-indicator {
+      .cpf-valid-indicator,
+      .cep-valid-indicator {
         position: absolute;
         right: 0.6rem;
         font-size: 0.75rem;
@@ -222,6 +226,29 @@
         background: #ecfdf5;
         padding: 0.15rem 0.4rem;
         border-radius: 4px;
+      }
+
+      .cep-loading-indicator {
+        position: absolute;
+        right: 0.6rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #2563eb;
+        background: #eff6ff;
+        padding: 0.15rem 0.4rem;
+        border-radius: 4px;
+        animation: pulse 1.5s infinite;
+      }
+
+      .address-display {
+        font-size: 0.75rem;
+        color: #334155;
+        font-weight: 500;
+        margin-top: 0.15rem;
+
+        &.error {
+          color: #dc2626;
+        }
       }
     }
   }
