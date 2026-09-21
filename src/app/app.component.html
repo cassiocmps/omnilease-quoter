@@ -12,7 +12,7 @@
 
       <div class="milestone-pill">
         <span class="pulse-dot"></span>
-        <span>Milestone 4: Fine-Grained Signals &amp; RxJS Interop</span>
+        <span>Milestone 5: Typed Forms &amp; Dynamic FormArrays</span>
       </div>
     </div>
   </header>
@@ -164,6 +164,17 @@
           </button>
         </div>
       </app-ui-card>
+    </section>
+
+    <!-- Quotation Wizard Section (Milestone 5: Typed Forms & FormArrays) -->
+    <section class="wizard-section">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Formulário de Subscrição (Wizard)</h2>
+          <p class="section-subtitle">Typed Reactive Forms com NonNullableFormBuilder, Validador de CPF e Co-locatários dinâmicos</p>
+        </div>
+      </div>
+      <app-quote-form (formSubmit)="onWizardSubmit($event)" />
     </section>
 
     <!-- Interactive Selection Notice Banner -->

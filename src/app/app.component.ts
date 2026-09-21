@@ -3,6 +3,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Subject } from 'rxjs';
 import { QuoteCardComponent } from './features/quotes/components/quote-card/quote-card.component';
+import { QuoteFormComponent } from './features/quotes/components/quote-form/quote-form.component';
 import { UiCardComponent } from './shared/components/ui-card/ui-card.component';
 import { CpfMaskDirective } from './shared/directives/cpf-mask.directive';
 import { CepMaskDirective } from './shared/directives/cep-mask.directive';
@@ -17,6 +18,7 @@ import { ProviderQuote } from './core/models/insurance.models';
     CommonModule,
     CurrencyPipe,
     QuoteCardComponent,
+    QuoteFormComponent,
     UiCardComponent,
     CpfMaskDirective,
     CepMaskDirective
@@ -235,6 +237,28 @@ export class AppComponent {
     if (target) {
       this.propertyCep.set(target.value);
       this.cepSubject.next(target.value);
+    }
+  }
+
+  /**
+   * Handles quotation wizard submission from QuoteFormComponent (Milestone 5).
+   */
+  onWizardSubmit(data: any): void {
+    if (data) {
+      this.rent.set(data.rentAmount);
+      this.condo.set(data.condoAmount);
+      this.iptu.set(data.iptuAmount);
+      if (data.primaryTenant) {
+        this.tenantName.set(data.primaryTenant.fullName);
+        this.tenantCpf.set(data.primaryTenant.cpf);
+        let totalIncome = data.primaryTenant.monthlyIncome;
+        if (Array.isArray(data.coTenants)) {
+          for (const co of data.coTenants) {
+            totalIncome += Number(co.monthlyIncome) || 0;
+          }
+        }
+        this.tenantIncome.set(totalIncome);
+      }
     }
   }
 

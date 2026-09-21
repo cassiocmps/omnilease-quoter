@@ -1,0 +1,207 @@
+<form [formGroup]="quoteForm" (ngSubmit)="onSubmit()" class="quote-form">
+  <!-- Section 1: Financial Commitment Parameters -->
+  <fieldset class="form-section">
+    <legend class="section-legend">
+      <span class="legend-number">1</span>
+      <span>Valores Locatícios Mensais</span>
+    </legend>
+
+    <div class="fields-grid-3">
+      <div class="form-group">
+        <label for="rentAmount">Aluguel (R$)</label>
+        <input
+          id="rentAmount"
+          type="number"
+          formControlName="rentAmount"
+          class="form-control"
+          min="500"
+          step="50"
+        />
+        @if (quoteForm.controls.rentAmount.touched && quoteForm.controls.rentAmount.invalid) {
+          <span class="error-msg">Aluguel mínimo é R$ 500,00</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="condoAmount">Condomínio (R$)</label>
+        <input
+          id="condoAmount"
+          type="number"
+          formControlName="condoAmount"
+          class="form-control"
+          min="0"
+          step="50"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="iptuAmount">IPTU Mensal (R$)</label>
+        <input
+          id="iptuAmount"
+          type="number"
+          formControlName="iptuAmount"
+          class="form-control"
+          min="0"
+          step="20"
+        />
+      </div>
+    </div>
+
+    <div class="commitment-badge">
+      <span>Compromisso Total: <strong>{{ totalCommitment | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}/mês</strong></span>
+      <span>Renda Mínima Exigida (3x): <strong>{{ minimumRequiredIncome | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong></span>
+    </div>
+  </fieldset>
+
+  <!-- Section 2: Primary Proponent / Tenant -->
+  <fieldset class="form-section" formGroupName="primaryTenant">
+    <legend class="section-legend">
+      <span class="legend-number">2</span>
+      <span>Proponente Principal (Locatário)</span>
+    </legend>
+
+    <div class="fields-grid-3">
+      <div class="form-group">
+        <label for="primaryName">Nome Completo</label>
+        <input
+          id="primaryName"
+          type="text"
+          formControlName="fullName"
+          class="form-control"
+          placeholder="Nome completo do proponente"
+        />
+        @if (quoteForm.controls.primaryTenant.controls.fullName.touched && quoteForm.controls.primaryTenant.controls.fullName.invalid) {
+          <span class="error-msg">Nome deve ter ao menos 3 caracteres</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="primaryCpf">CPF</label>
+        <input
+          id="primaryCpf"
+          type="text"
+          formControlName="cpf"
+          appCpfMask
+          class="form-control"
+          placeholder="000.000.000-00"
+          maxlength="14"
+        />
+        @if (quoteForm.controls.primaryTenant.controls.cpf.touched && quoteForm.controls.primaryTenant.controls.cpf.invalid) {
+          <span class="error-msg">CPF inválido ou dígito verificador incorreto</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="primaryIncome">Renda Mensal Comprovada (R$)</label>
+        <input
+          id="primaryIncome"
+          type="number"
+          formControlName="monthlyIncome"
+          class="form-control"
+          min="1000"
+          step="100"
+        />
+        @if (quoteForm.controls.primaryTenant.controls.monthlyIncome.touched && quoteForm.controls.primaryTenant.controls.monthlyIncome.invalid) {
+          <span class="error-msg">Renda mínima do titular é R$ 1.000,00</span>
+        }
+      </div>
+    </div>
+  </fieldset>
+
+  <!-- Section 3: Dynamic Co-Tenants FormArray -->
+  <fieldset class="form-section" formArrayName="coTenants">
+    <div class="array-header">
+      <legend class="section-legend">
+        <span class="legend-number">3</span>
+        <span>Co-locatários para Composição de Renda (FormArray)</span>
+      </legend>
+      <button type="button" class="btn-add" (click)="addCoTenant()">
+        + Adicionar Co-locatário
+      </button>
+    </div>
+
+    @for (tenant of coTenants.controls; track $index) {
+      <div class="cotenant-row" [formGroupName]="$index">
+        <div class="form-group">
+          <label>Nome do Co-locatário</label>
+          <input type="text" formControlName="fullName" class="form-control" placeholder="Nome do co-locatário" />
+        </div>
+
+        <div class="form-group">
+          <label>CPF</label>
+          <input type="text" formControlName="cpf" appCpfMask class="form-control" placeholder="000.000.000-00" maxlength="14" />
+        </div>
+
+        <div class="form-group">
+          <label>Renda Mensal (R$)</label>
+          <input type="number" formControlName="monthlyIncome" class="form-control" min="500" step="100" />
+        </div>
+
+        <div class="form-group action-col">
+          <label>&nbsp;</label>
+          <button type="button" class="btn-remove" (click)="removeCoTenant($index)" title="Remover co-locatário">
+            ✕ Remover
+          </button>
+        </div>
+      </div>
+    } @empty {
+      <p class="empty-hint">Nenhum co-locatário adicionado. Adicione co-locatários se a renda do titular for menor que 3x o compromisso.</p>
+    }
+  </fieldset>
+
+  <!-- Section 4: Coverages -->
+  <fieldset class="form-section" formGroupName="coverages">
+    <legend class="section-legend">
+      <span class="legend-number">4</span>
+      <span>Coberturas Acessórias Contratadas</span>
+    </legend>
+
+    <div class="checkbox-group">
+      <label class="checkbox-label">
+        <input type="checkbox" formControlName="propertyDamage" />
+        <span>Danos ao Imóvel (Incêndio, Explosão e Queda de Raio)</span>
+      </label>
+
+      <label class="checkbox-label">
+        <input type="checkbox" formControlName="internalPainting" />
+        <span>Pintura Interna e Externa</span>
+      </label>
+
+      <label class="checkbox-label">
+        <input type="checkbox" formControlName="assistance24h" />
+        <span>Assistência Emergencial 24h Residencial</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <!-- Section 5: Underwriting Validation Banner (Cross-Field) -->
+  @if (quoteForm.errors?.['insufficientIncome']; as err) {
+    <div class="underwriting-alert error" role="alert">
+      <div class="alert-icon">⚠</div>
+      <div class="alert-content">
+        <strong>Subscrição Pendente: Renda Familiar Insuficiente</strong>
+        <p>
+          A soma das rendas comprovadas ({{ totalHouseholdIncome | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}) não atinge o mínimo exigido de
+          {{ err.minimumRequired | currency:'BRL':'symbol':'1.2-2':'pt-BR' }} (3x o compromisso de {{ err.totalCommitment | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}).
+          <strong>Déficit para qualificação: {{ err.deficit | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}</strong>. Adicione um co-locatário para compor a renda.
+        </p>
+      </div>
+    </div>
+  } @else {
+    <div class="underwriting-alert success" role="status">
+      <div class="alert-icon">✓</div>
+      <div class="alert-content">
+        <strong>Qualificação Aprovada</strong>
+        <p>
+          Renda consolidada de {{ totalHouseholdIncome | currency:'BRL':'symbol':'1.2-2':'pt-BR' }} cobre com folga a exigência regulatória de 3x ({{ minimumRequiredIncome | currency:'BRL':'symbol':'1.2-2':'pt-BR' }}).
+        </p>
+      </div>
+    </div>
+  }
+
+  <div class="form-actions">
+    <button type="submit" class="btn-submit" [disabled]="quoteForm.invalid">
+      Calcular Cotações Multi-Seguradora
+    </button>
+  </div>
+</form>
