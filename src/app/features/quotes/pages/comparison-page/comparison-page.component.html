@@ -5,8 +5,33 @@
       <h2 class="page-title">Comparativo de Fiança Locatícia</h2>
       <p class="page-subtitle">Propostas calculadas em tempo real com base no perfil de crédito do locatário</p>
     </div>
-    <span class="quotes-count">{{ quotes().length }} Propostas Ativas</span>
+    <div class="top-bar-actions">
+      <span class="quotes-count">{{ quotes().length }} Propostas Ativas</span>
+      <button
+        type="button"
+        class="refresh-stream-btn"
+        (click)="refreshStreamingQuotes()"
+        [disabled]="isStreaming()"
+      >
+        @if (isStreaming()) {
+          <span>📡 Transmitindo via merge...</span>
+        } @else {
+          <span>↻ Re-executar Streaming (RxJS)</span>
+        }
+      </button>
+    </div>
   </div>
+
+  <!-- Milestone 7 Progressive Streaming Banner -->
+  @if (isStreaming()) {
+    <div class="streaming-banner" role="status">
+      <div class="stream-pulse"></div>
+      <div>
+        <strong>Multi-Carrier Async Streaming em Andamento (RxJS merge)</strong>
+        <p>Apex Marine chega aos ~600ms, Vanguard Surety aos ~1200ms e Beacon Assurance aos ~1800ms. Cada proposta surge na tela assim que calculada!</p>
+      </div>
+    </div>
+  }
 
   @if (selectedQuote(); as activeQuote) {
     <div class="selection-callout">

@@ -1,10 +1,13 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { LOCALE_ID } from '@angular/core';
 import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
 import { ComparisonPageComponent } from './comparison-page.component';
 import { QuoteStateService } from '../../../../core/services/quote-state.service';
+import { QuotationService } from '../../../../core/services/quotation.service';
 import { ProviderQuote } from '../../../../core/models/insurance.models';
 
 registerLocaleData(localePt);
@@ -36,6 +39,9 @@ describe('ComparisonPageComponent', () => {
       imports: [ComparisonPageComponent],
       providers: [
         QuoteStateService,
+        QuotationService,
+        provideHttpClient(),
+        provideHttpClientTesting(),
         provideRouter([]),
         { provide: LOCALE_ID, useValue: 'pt-BR' }
       ]
@@ -63,4 +69,23 @@ describe('ComparisonPageComponent', () => {
     expect(quoteState.selectedQuote()).toEqual(mockQuote);
     expect(router.navigate).toHaveBeenCalledWith(['/policy', 'apex-marine']);
   });
+
+  it('should stream quotes progressively when refreshStreamingQuotes is invoked', fakeAsync(() => {
+    component.refreshStreamingQuotes();
+    expect(component.isStreaming()).toBeTrue();
+
+    // After 600ms Apex Marine arrives
+    tick(600);
+    expect(component.quotes().length).toBe(1);
+    expect(component.quotes()[0].providerId).toBe('apex-marine');
+
+    // After 1200ms Vanguard Surety arrives
+    tick(600);
+    expect(component.quotes().length).toBe(2);
+
+    // After 1800ms Beacon Assurance arrives and completes
+    tick(600);
+    expect(component.quotes().length).toBe(3);
+    expect(component.isStreaming()).toBeFalse();
+  }));
 });
